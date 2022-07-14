@@ -2,8 +2,45 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db.models import QuerySet, Manager
 
 
+#######################################
+#              QuerySets               #
+#######################################
+
+
+class UserQuerySet(QuerySet):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+    def staff(self):
+        return self.filter(is_staff=True)
+
+    def superusers(self):
+        return self.filter(is_superuser=True)
+
+
+class TeacherQuerySet(QuerySet):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+
+class StudentQuerySet(QuerySet):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+
+#######################################
+#              Managers               #
+#######################################
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
+
+    def get_queryset(self):
+        return UserQuerySet(self.model, using=self._db)
 
     def _create_user(self, phone_number, password, **extra_fields):
         """
@@ -37,11 +74,14 @@ class UserManager(BaseUserManager):
 
         return self._create_user(phone_number, password, **extra_fields)
 
-
-class StudentQuerySet(QuerySet):
-
     def active(self):
-        return self.filter(is_active=True)
+        return self.get_queryset().active()
+
+    def staff(self):
+        return self.get_queryset().staff()
+
+    def superusers(self):
+        return self.get_queryset().superusers()
 
 
 class StudentManager(Manager):
@@ -52,15 +92,11 @@ class StudentManager(Manager):
         self.get_queryset().active()
 
 
-class TeacherQuerySet(QuerySet):
-
-    def active(self):
-        return self.filter(is_active=True)
-
-
 class TeacherManager(Manager):
     def get_queryset(self):
         return TeacherQuerySet(self.model, using=self._db).filter(is_teacher=True)
 
     def active(self):
         self.get_queryset().active()
+
+
