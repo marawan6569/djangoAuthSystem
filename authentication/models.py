@@ -4,10 +4,12 @@ from django.core.mail import send_mail
 from django.db import models
 
 from .managers import UserManager, StudentManager, TeacherManager
+from .validations import phone_number_validation
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=15, unique=True, verbose_name='phone number')
+    phone_number = models.CharField(max_length=15, unique=True, verbose_name='phone number',
+                                    validators=phone_number_validation)
     email = models.EmailField(unique=True, verbose_name='email address')
     first_name = models.CharField(max_length=30, blank=True, verbose_name='first name')
     last_name = models.CharField(max_length=30, blank=True, verbose_name='last name')
