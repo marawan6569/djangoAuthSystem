@@ -1,5 +1,5 @@
 import re
-from django.forms import Form, ModelForm, CharField,TextInput, PasswordInput, ValidationError
+from django.forms import Form, ModelForm, CharField, TextInput, PasswordInput, ValidationError
 from .models import User
 
 
@@ -74,3 +74,7 @@ class LoginForm(Form):
             raise ValidationError('Not valid email or phone number')
         else:
             return email_or_phone
+
+
+class ConfirmForm(Form):
+    code = CharField(min_length=9, max_length=9, widget=TextInput({'placeholder': 'Enter Your Code'}))
