@@ -4,17 +4,32 @@ from django.core.mail import send_mail
 from django.db import models
 
 from .managers import UserManager, StudentManager, TeacherManager
-from .validations import phone_number_validation
+from .validations import phone_number_validation, password_validators, validate_image_extension
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=15, unique=True, verbose_name='phone number',
-                                    validators=phone_number_validation)
+    phone_number = models.CharField(
+                                    max_length=14, unique=True, verbose_name='phone number',
+                                    validators=phone_number_validation,
+                                    help_text='Must be in E.164 format i.e. +xxxxxxxxxxx .'
+                                    )
     email = models.EmailField(unique=True, verbose_name='email address')
     first_name = models.CharField(max_length=30, blank=True, verbose_name='first name')
     last_name = models.CharField(max_length=30, blank=True, verbose_name='last name')
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name='date joined')
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    avatar = models.ImageField(
+                                upload_to='avatars/', null=True, blank=True,
+                                validators=[validate_image_extension],
+                                help_text='Supported content types: jpg, jpeg, png .'
+                               )
+
+    password = models.CharField(
+                                max_length=128,
+                                verbose_name="password",
+                                help_text='Password must contains at lest one '
+                                          '(capital character, small character, digit, special character)'
+                                          ' and must be at lest 8 characters',
+                                validators=password_validators)
 
     is_active = models.BooleanField(default=True, verbose_name='active')
     is_staff = models.BooleanField(default=False, verbose_name='staff')
